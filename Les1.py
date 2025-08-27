@@ -1,17 +1,15 @@
-#!/usr/bin/env python3
 """
 Видео-скачиватель с YouTube и Rutube
 Использует библиотеку yt-dlp
 
-Примеры запуска:
-  python downloader.py "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  python downloader.py "https://rutube.ru/video/..."
-  python downloader.py "https://www.youtube.com/playlist?list=PL..." -o "Videos"
-  python downloader.py "https://rutube.ru/channel/..." --audio
+Работает даже если ffmpeg не установлен:
+ - с ffmpeg: объединяет видео+аудио (лучшее качество)
+ - без ffmpeg: берёт формат "best" (однофайловый)
 """
 
 import argparse
 from pathlib import Path
+import shutil
 import sys
 
 try:
@@ -25,13 +23,23 @@ def download(url: str, output: str, audio_only: bool):
     outdir = Path(output).expanduser()
     outdir.mkdir(parents=True, exist_ok=True)
 
+    # Проверяем, есть ли ffmpeg
+    has_ffmpeg = shutil.which("ffmpeg") is not None
+
+    # Если ffmpeg установлен — используем "bestvideo+bestaudio/best"
+    # иначе fallback на "best" (без объединения)
+    if audio_only:
+        ydl_format = "bestaudio/best"
+    else:
+        ydl_format = "bestvideo+bestaudio/best" if has_ffmpeg else "best"
+
     ydl_opts = {
         "outtmpl": str(outdir / "%(title).200B [%(id)s].%(ext)s"),
-        "format": "bestaudio/best" if audio_only else "bestvideo+bestaudio/best",
+        "format": ydl_format,
         "postprocessors": [],
     }
 
-    if audio_only:
+    if audio_only and has_ffmpeg:
         ydl_opts["postprocessors"].append({
             "key": "FFmpegExtractAudio",
             "preferredcodec": "mp3",
