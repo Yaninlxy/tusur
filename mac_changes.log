@@ -1,4 +1,6 @@
-2025-09-20 13:19:40,390 - Удалён MAC: 4C-6B-B8-91-D1-6C
-2025-09-20 13:19:46,502 - Добавлен новый MAC: 4C-6B-B8-91-D1-6C
-2025-09-20 13:19:53,567 - Удалён MAC: 00-FF-86-75-C9-E0
-2025-09-20 13:19:56,384 - Добавлен новый MAC: 00-FF-86-75-C9-E0
+2025-09-20 19:46:26,249 - scan worker error
+Traceback (most recent call last):
+  File "c:\Users\yanin\TUSUR\tusur\MAC-Adress.py", line 267, in worker
+    self.conn.commit()
+    ~~~~~~~~~~~~~~~~^^
+sqlite3.ProgrammingError: SQLite objects created in a thread can only be used in that same thread. The object was created in thread id 19520 and this is thread id 10788.
